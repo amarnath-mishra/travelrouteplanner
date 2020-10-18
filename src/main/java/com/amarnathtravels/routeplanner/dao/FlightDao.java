@@ -19,4 +19,8 @@ public class FlightDao implements IFlightDao{
 		public Map<String, Flight> getAllFlightsMap() {
 				return flightsScheduleInMemoryDb.getFlightMap();
 		}
+
+		@Override public Flight findFlightByCode(String flightCode) {
+				return null;
+		}
 }

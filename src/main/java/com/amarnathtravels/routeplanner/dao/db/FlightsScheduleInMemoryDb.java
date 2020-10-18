@@ -33,6 +33,22 @@ public class FlightsScheduleInMemoryDb implements ITravelInMemoryDB {
 				return flightMap;
 		}
 
+		@Override
+		public Flight findFlightByCode(String flightCode) {
+				return flightMap.get(flightCode);
+		}
+
+		@Override
+		public Airport findAirportByCode(String airportCode) {
+				return airportMap.get(airportCode);
+		}
+
+		@Override
+		public boolean saveAllAirports(Map<String, Airport> airportMap) {
+				this.airportMap=airportMap;
+				return true;
+		}
+
 		@PostConstruct
 		private void init(){
 				//flightSchedules.

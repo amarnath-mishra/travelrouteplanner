@@ -8,4 +8,6 @@ public interface IFlightDao {
 
 		boolean saveAllFlights(Map<String, Flight> flightMap);
 		Map<String, Flight> getAllFlightsMap();
+
+		Flight findFlightByCode(String flightCode);
 }

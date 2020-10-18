@@ -7,4 +7,6 @@ import java.util.Map;
 
 public interface IAirportDao {
 		Map<String, Airport> getAllAirportsMap();
+		Airport findAirportByCode(String airportCode);
+		boolean saveAllAirports(Map<String, Airport> airportMap);
 }
