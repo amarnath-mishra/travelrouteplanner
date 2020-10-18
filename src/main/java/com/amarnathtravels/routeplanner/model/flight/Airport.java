@@ -10,5 +10,6 @@ public class Airport {
 		private String address; //TODO: Make a address class
 		private String code;
 		private List<Flight> flightList;
+		private AirportType airportType;
 
 }
