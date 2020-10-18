@@ -2,18 +2,36 @@ package com.amarnathtravels.routeplanner.dao.db;
 
 import com.amarnathtravels.routeplanner.dao.IFlightsScheduleDao;
 import com.amarnathtravels.routeplanner.dao.route.Connection;
-import com.amarnathtravels.routeplanner.model.flight.Airport;
-import com.amarnathtravels.routeplanner.model.flight.FlightSchedule;
+import com.amarnathtravels.routeplanner.model.BookingStatus;
+import com.amarnathtravels.routeplanner.model.flight.*;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Component
-public class FlightsScheduleInMemoryDb implements IFlightsScheduleDao {
-		Map<Airport, Connection> graph = new HashMap<>();
+public class FlightsScheduleInMemoryDb implements ITravelInMemoryDB {
+		//Storing key as UniqueAirportCode and connections as directed graph edge which are nothing but routes
+		private Map<String, Connection> graph = new HashMap<>();
+		private Map<String, Airport> airportMap = new HashMap<>();
+		private Map<String, Flight> flightMap = new HashMap<>();
+
+		public Map<String, Connection> getGraph() {
+				return graph;
+		}
+
+		public Map<String, Airport> getAirportMap() {
+				return airportMap;
+		}
+
+		public Map<String, Flight> getFlightMap() {
+				return flightMap;
+		}
 
 		@PostConstruct
 		private void init(){
@@ -21,7 +39,8 @@ public class FlightsScheduleInMemoryDb implements IFlightsScheduleDao {
 		}
 
 		@Override
-		public boolean saveAllFlights(Object T) {
-				return false;
+		public boolean saveAllFlights(Map<String, Flight> flightMap) {
+				this.flightMap=flightMap;
+				return true;
 		}
 }

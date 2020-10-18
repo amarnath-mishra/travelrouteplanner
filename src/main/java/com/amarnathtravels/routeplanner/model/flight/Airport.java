@@ -11,5 +11,5 @@ public class Airport {
 		private String code;
 		private List<Flight> flightList;
 		private AirportType airportType;
-
+		private Country country;
 }
