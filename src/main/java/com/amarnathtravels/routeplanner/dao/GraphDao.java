@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphDao implements IGraphDao{
-		@Autowired ITravelInMemoryDB iTravelInMemoryDB;
+		@Autowired
+		ITravelInMemoryDB iTravelInMemoryDB;
 		@Override
 		public boolean saveGraph(Map<String, Map<String, List<Map<String, List<Connection>>>>> graph) {
 				return iTravelInMemoryDB.loadGraphConnections(graph);

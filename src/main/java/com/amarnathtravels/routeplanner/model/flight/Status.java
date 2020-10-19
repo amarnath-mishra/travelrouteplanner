@@ -1,6 +1,6 @@
 package com.amarnathtravels.routeplanner.model.flight;
 
-public enum FlightStatus {
+public enum Status {
 		SCHEDULED,
 		ACTIVE,
 		DELAYED,

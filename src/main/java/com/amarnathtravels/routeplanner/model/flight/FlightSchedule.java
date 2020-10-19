@@ -10,5 +10,5 @@ public class FlightSchedule {
 		private LocalDateTime departureTime;
 		private LocalDateTime arrivalTime;
 		private String Gate;
-		private FlightStatus flightStatus;
+		private Status status;
 }

@@ -15,6 +15,8 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		private Map<String, Map<String,List<Map<String, List<Connection>>>>> graph;
 		private Map<String, Airport> airportMap;
 		private Map<String, Flight> flightMap;
+		private Map<String, String> codeVsCityMap= new HashMap<>();
+
 
 		@Override
 		public Map<String, Map<String, List<Map<String, List<Connection>>>>> getGraph() {
