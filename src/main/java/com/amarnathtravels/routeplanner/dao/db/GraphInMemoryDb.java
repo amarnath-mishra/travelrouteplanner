@@ -1,34 +1,30 @@
 package com.amarnathtravels.routeplanner.dao.db;
 
-import com.amarnathtravels.routeplanner.dao.IFlightsScheduleDao;
 import com.amarnathtravels.routeplanner.dao.route.Connection;
-import com.amarnathtravels.routeplanner.model.BookingStatus;
 import com.amarnathtravels.routeplanner.model.flight.*;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
-public class FlightsScheduleInMemoryDb implements ITravelInMemoryDB {
-		//Storing key as UniqueAirportCode and connections as directed graph edge which are nothing but routes
-		private Map<String, Connection> graph = new HashMap<>();
-		private Map<String, Airport> airportMap = new HashMap<>();
-		private Map<String, Flight> flightMap = new HashMap<>();
+public class GraphInMemoryDb implements ITravelInMemoryDB {
+		//City, aiportCode , BusCode
+		//City -> List of TravelMode(Airport/Bus) -> List of Flight/Bus connection
+		//And at last level, key is UniqueAirportCode/BusStationCode and connections as directed graph edge which are nothing but routes
+		private Map<String, Map<String,List<Map<String, List<Connection>>>>> graph;
+		private Map<String, Airport> airportMap;
+		private Map<String, Flight> flightMap;
 
-		public Map<String, Connection> getGraph() {
+		@Override
+		public Map<String, Map<String, List<Map<String, List<Connection>>>>> getGraph() {
 				return graph;
 		}
-
+		@Override
 		public Map<String, Airport> getAirportMap() {
 				return airportMap;
 		}
-
+		@Override
 		public Map<String, Flight> getFlightMap() {
 				return flightMap;
 		}
@@ -47,6 +43,13 @@ public class FlightsScheduleInMemoryDb implements ITravelInMemoryDB {
 		public boolean saveAllAirports(Map<String, Airport> airportMap) {
 				this.airportMap=airportMap;
 				return true;
+		}
+
+		@Override
+		public boolean loadGraphConnections(
+				Map<String, Map<String, List<Map<String, List<Connection>>>>> graph) {
+				this.graph = graph;
+				return false;
 		}
 
 		@PostConstruct

@@ -8,9 +8,8 @@ import java.util.List;
 public class Flight {
 
 		private String flightNo;
-		private Airport source;
-		private Airport dest;
-		private float duration;
 		private List<FlightSeat> seats;
+
+		//TODO:Other flight related Specs here we can have
 
 }

@@ -2,6 +2,7 @@ package com.amarnathtravels.routeplanner.service;
 
 import com.amarnathtravels.routeplanner.dao.IAirportDao;
 import com.amarnathtravels.routeplanner.dao.IFlightDao;
+import com.amarnathtravels.routeplanner.dao.IGraphDao;
 import com.amarnathtravels.routeplanner.dao.route.Connection;
 import com.amarnathtravels.routeplanner.model.BookingStatus;
 import com.amarnathtravels.routeplanner.model.flight.*;
@@ -13,15 +14,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 @Service
 @RequiredArgsConstructor
-public class ExcepUploaderService implements IExcelUploadService{
+public class ExcelUploaderService implements IExcelUploadService{
 		private final IFlightDao flightDao;
 		private final IAirportDao airportDao;
+		private final IGraphDao iGraphDao;
 		@Override
 		public boolean loadAirportsUsingExcel(XSSFWorkbook workbook) {
 				try {
@@ -73,13 +73,11 @@ public class ExcepUploaderService implements IExcelUploadService{
 		private Flight createFlight(XSSFRow row) {
 				Flight flight = new Flight();
 				flight.setFlightNo(row.getCell(0).getStringCellValue());
-				flight.setSource(airportDao.findAirportByCode(row.getCell(1).getStringCellValue()));
-				flight.setDest(airportDao.findAirportByCode(row.getCell(2).getStringCellValue()));
-				int numberOfBusinessSeats = (int) row.getCell(3).getNumericCellValue();
-				int numberOfEconomySeats = (int) row.getCell(4).getNumericCellValue();
-				//				int businessPrice = (int) row.getCell(5).getNumericCellValue();
-				//				int economyPrice = (int) row.getCell(6).getNumericCellValue();
-				//				CurrencyType currency = CurrencyType.valueOf(row.getCell(7).getStringCellValue());
+//				flight.setSource(airportDao.findAirportByCode(row.getCell(1).getStringCellValue()));
+//				flight.setDest(airportDao.findAirportByCode(row.getCell(2).getStringCellValue()));
+				int numberOfBusinessSeats = (int) row.getCell(1).getNumericCellValue();
+				int numberOfEconomySeats = (int) row.getCell(2).getNumericCellValue();
+				//CurrencyType currency = CurrencyType.valueOf(row.getCell(7).getStringCellValue());
 				List<FlightSeat> flightSeats = createSeats(numberOfBusinessSeats, numberOfEconomySeats);
 				flight.setSeats(flightSeats);
 				return flight;
@@ -99,14 +97,12 @@ public class ExcepUploaderService implements IExcelUploadService{
 		@Override
 		public boolean loadFlightSchedulesUsingExcelAndCreateTravelNetwork(XSSFWorkbook workbook) {
 				try {
-						Map<String, Flight> flightMap =  new HashMap<>();
 						XSSFSheet worksheet = workbook.getSheetAt(0);
-						String dateTimePattern = "yyyy MMM dd HH:mm zzz";
-						DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
+						Map<String, Connection> connectionMap =  new HashMap<>();
 						for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
 								XSSFRow row = worksheet.getRow(i);
 								Connection connection = createConnection(row);
-								flightMap.putIfAbsent(flight.getFlightNo(),flight);
+								connectionMap.putIfAbsent(connection.getFlight().getFlightNo(),connection);
 						}
 						return flightDao.saveAllFlights(flightMap);
 
@@ -119,11 +115,26 @@ public class ExcepUploaderService implements IExcelUploadService{
 
 		private Connection createConnection(XSSFRow row) {
 				Connection connection = new Connection();
+
 				String dateTimePattern = "yyyy MMM dd HH:mm zzz";
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
 				connection.setFlight(flightDao.findFlightByCode(row.getCell(0).getStringCellValue()));
-				connection.setArrivalTime(LocalDateTime.parse(row.getCell(0).getStringCellValue(), formatter));
-				connection.setDeptTime(LocalDateTime.parse(row.getCell(0).getStringCellValue(), formatter));
-				airportDao.findAirportByCode(connection.getFlight().getSource().getCode()).set
+				connection.setSource(airportDao.findAirportByCode(row.getCell(1).getStringCellValue()));
+				connection.setDest(airportDao.findAirportByCode(row.getCell(2).getStringCellValue()));
+				connection.setDeptTime(LocalDateTime.parse(row.getCell(3).getStringCellValue(), formatter));
+				connection.setArrivalTime(LocalDateTime.parse(row.getCell(4).getStringCellValue(), formatter));
+				connection.setFlightStatus(FlightStatus.valueOf(row.getCell(5).getStringCellValue()));
+				List<FlightSeat> seats = flightDao.findFlightByCode(connection.getFlight().getFlightNo()).getSeats();
+				connection.setConnId(connection.getFlight().getFlightNo() + connection.getSource().getCode()+ (new Date().getTime()));
+				int businessPrice = (int) row.getCell(6).getNumericCellValue();
+				int economyPrice = (int) row.getCell(7).getNumericCellValue();
+				seats.forEach(flightSeat -> {
+						if(flightSeat.getSeatClass()==FlightSeatClass.BUSINESS){
+								flightSeat.setFare(businessPrice);
+						} else{
+								flightSeat.setFare(economyPrice);
+						}
+				});
+				//airportDao.findAirportByCode(connection.getFlight().getSource().getCode()).set
 		}
 }

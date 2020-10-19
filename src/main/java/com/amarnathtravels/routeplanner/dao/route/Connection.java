@@ -1,20 +1,16 @@
 package com.amarnathtravels.routeplanner.dao.route;
 
-import com.amarnathtravels.routeplanner.model.flight.Airport;
-import com.amarnathtravels.routeplanner.model.flight.Flight;
-import com.amarnathtravels.routeplanner.model.flight.Price;
+import com.amarnathtravels.routeplanner.model.flight.FlightStatus;
+import com.amarnathtravels.routeplanner.model.flight.TicketPrice;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
 public class Connection {
-		Flight flight;
-		Airport source;
-		Airport dest;
+		String connId;
 		LocalDateTime deptTime;
 		LocalDateTime arrivalTime;
-		Connection type;
-		Price price;
-
+		ConnectionType type;
+		TicketPrice ticketPrice;
 }
