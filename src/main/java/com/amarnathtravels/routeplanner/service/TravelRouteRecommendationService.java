@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,15 @@ public class TravelRouteRecommendationService implements ITravelRouteRecommendat
 		 */
 		private List<Connection> getPathsOfShortestDurationToReachDestination(Map<String, List<Connection>> graph,
 				String src, String dest, TravelMode travelMode, Date date) {
+				Map<String, List<Connection>> trimmedGraph = trimGraphForShortestPathDijstra(graph, src, dest, travelMode, date);
+				ShortestPathUsingDijkstra shortestPathUsingDijkstra = new ShortestPathUsingDijkstra(trimmedGraph.size());
+			return null;
+		}
 
+		private Map<String, List<Connection>> trimGraphForShortestPathDijstra(Map<String, List<Connection>> graph, String src, String dest, TravelMode travelMode, Date date) {
+				Map<String, List<Connection>> trimmedGraph = new HashMap<>();
+				for(Map.Entry<String, List<Connection>> entry : graph.entrySet()){
 
+				}
 		}
 }

@@ -1,6 +1,7 @@
 package com.amarnathtravels.routeplanner.dao.db;
 
 import com.amarnathtravels.routeplanner.dao.route.Connection;
+import com.amarnathtravels.routeplanner.dao.route.GraphNode;
 import com.amarnathtravels.routeplanner.dao.route.TravelMode;
 import com.amarnathtravels.routeplanner.model.flight.Airport;
 import com.amarnathtravels.routeplanner.model.flight.Flight;
@@ -13,13 +14,13 @@ public interface ITravelInMemoryDB {
 		Flight findFlightByCode(String flightCode);
 		Airport findAirportByCode(String airportCode);
 		boolean saveAllFlights(Map<String, Flight> flightMap);
-		Map<String, Map<String, Map<String, List<Connection>>>> getGraph();
+		Map<String, Map<String, Map<String, List<GraphNode>>>> getGraph();
 		Map<String, Airport> getAirportMap();
 		Map<String, Flight> getFlightMap();
 		Map<String, String> getCodeVsCityMap();
 		boolean saveAllAirports(Map<String, Airport> airportMap);
-		boolean loadGraphConnections(Map<String, Map<String, Map<String, List<Connection>>>> graph);
+		boolean loadGraphConnections(Map<String, Map<String, Map<String, List<GraphNode>>>> graph);
 
-		Map<String, List<Connection>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src, String dest, TravelMode travelMode, Date date);
+		Map<String, List<GraphNode>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src, String dest, TravelMode travelMode, Date date);
 
 }

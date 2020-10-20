@@ -1,6 +1,7 @@
 package com.amarnathtravels.routeplanner.dao.db;
 
 import com.amarnathtravels.routeplanner.dao.route.Connection;
+import com.amarnathtravels.routeplanner.dao.route.GraphNode;
 import com.amarnathtravels.routeplanner.dao.route.TravelMode;
 import com.amarnathtravels.routeplanner.model.flight.*;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		 * but for now I am assuming each city will have only one airport and one bus stand, although we can have this use case with current Graph Structure also
 		 */
 
-		private Map<String, Map<String,Map<String, List<Connection>>>> graph;
+		private Map<String, Map<String,Map<String, List<GraphNode>>>> graph;
 		private Map<String, Airport> airportMap;
 		private Map<String, Flight> flightMap;
 		private Map<String, String> codeVsCityMap= new HashMap<>();
@@ -40,7 +41,7 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		}
 
 		@Override
-		public Map<String, List<Connection>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src,
+		public Map<String, List<GraphNode>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src,
 				String dest, TravelMode travelMode, Date date) {
 				/***:: For now I am returning the entire Graph, but we can assume that
 				 * we can assume that we have applied these filters given in parameters of this function
@@ -53,7 +54,7 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 
 		@Override
 		public boolean loadGraphConnections(
-				Map<String, Map<String, Map<String, List<Connection>>>> graph) {
+				Map<String, Map<String, Map<String, List<GraphNode>>>> graph) {
 				this.graph = graph;
 				return false;
 		}
@@ -66,7 +67,7 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		}
 
 		@Override
-		public Map<String, Map<String, Map<String, List<Connection>>>> getGraph() {
+		public Map<String, Map<String, Map<String, List<GraphNode>>>> getGraph() {
 				return graph;
 		}
 		@Override
