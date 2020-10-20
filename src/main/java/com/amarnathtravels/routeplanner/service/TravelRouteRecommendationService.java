@@ -2,12 +2,13 @@ package com.amarnathtravels.routeplanner.service;
 
 import com.amarnathtravels.routeplanner.dao.IGraphDao;
 import com.amarnathtravels.routeplanner.dao.route.Connection;
+import com.amarnathtravels.routeplanner.dao.route.GraphNode;
 import com.amarnathtravels.routeplanner.dao.route.TravelMode;
+import com.amarnathtravels.routeplanner.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +22,10 @@ public class TravelRouteRecommendationService implements ITravelRouteRecommendat
 		 * @return
 		 */
 		@Override
-		public List<Connection> getLeastTimeTakenRoute(String src, String dest,String travelMode1, Date date) {
+		public List<Node> getLeastTimeTakenRoute(String src, String dest,String travelMode1, LocalDateTime date) {
 				TravelMode travelMode = TravelMode.valueOf(travelMode1);
-				Map<String, List<Connection>> graph = graphDao.fetchGraphBasedOnSourceDestTravelModeAndDate(src, dest, travelMode, date);
-				List<Connection> paths= getPathsOfShortestDurationToReachDestination(graph, src, dest, travelMode, date);
+				Map<String, List<GraphNode>> graph = graphDao.fetchGraphBasedOnSourceDestTravelModeAndDate(src, dest, travelMode, date);
+				List<Node> paths= getPathsOfShortestDurationToReachDestination( graph, src, dest, travelMode, date);
 				return paths;
 		}
 
@@ -33,17 +34,12 @@ public class TravelRouteRecommendationService implements ITravelRouteRecommendat
 		 * but we can modify this function to return different results as well, like return Top K results using K shortest Paths etc
 		 * and in that case it should return List<List<Connection>>.
 		 */
-		private List<Connection> getPathsOfShortestDurationToReachDestination(Map<String, List<Connection>> graph,
-				String src, String dest, TravelMode travelMode, Date date) {
-				Map<String, List<Connection>> trimmedGraph = trimGraphForShortestPathDijstra(graph, src, dest, travelMode, date);
-				ShortestPathUsingDijkstra shortestPathUsingDijkstra = new ShortestPathUsingDijkstra(trimmedGraph.size());
-			return null;
+		private List<Node> getPathsOfShortestDurationToReachDestination(Map<String, List<GraphNode>> graph,
+				String src, String dest, TravelMode travelMode, LocalDateTime date) {
+				ShortestPathUsingDijkstra shortestPathUsingDijkstra = new ShortestPathUsingDijkstra(graph.size());
+				List<Node> shortestPath = shortestPathUsingDijkstra.getShortestPath(graph, src, dest, travelMode, date);
+				return shortestPath;
 		}
 
-		private Map<String, List<Connection>> trimGraphForShortestPathDijstra(Map<String, List<Connection>> graph, String src, String dest, TravelMode travelMode, Date date) {
-				Map<String, List<Connection>> trimmedGraph = new HashMap<>();
-				for(Map.Entry<String, List<Connection>> entry : graph.entrySet()){
 
-				}
-		}
 }

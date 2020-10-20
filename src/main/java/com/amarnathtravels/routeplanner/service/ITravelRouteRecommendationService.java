@@ -1,11 +1,11 @@
 package com.amarnathtravels.routeplanner.service;
 
-import com.amarnathtravels.routeplanner.dao.route.Connection;
+import com.amarnathtravels.routeplanner.model.Node;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ITravelRouteRecommendationService {
 
-		List<Connection> getLeastTimeTakenRoute(String src, String dest,String travelMode, Date date);
+		List<Node> getLeastTimeTakenRoute(String src, String dest,String travelMode, LocalDateTime date);
 }

@@ -53,8 +53,10 @@ public class ExcelUploaderService implements IExcelUploadService{
 			airport.setName(row.getCell(0).getStringCellValue());
 			airport.setAddress(row.getCell(1).getStringCellValue());
 			airport.setCode(row.getCell(2).getStringCellValue());
-			airport.setAirportType(AirportType.valueOf(row.getCell(3).getStringCellValue()));
-			airport.setCountry(Country.valueOf(row.getCell(4).getStringCellValue()));
+			String city = row.getCell(3).getStringCellValue();
+			iGraphDao.getCodeVsCityMap().putIfAbsent(airport.getCode(),city);
+			airport.setAirportType(AirportType.valueOf(row.getCell(4).getStringCellValue()));
+			airport.setCountry(Country.valueOf(row.getCell(5).getStringCellValue()));
 			return airport;
 		}
 
@@ -103,7 +105,7 @@ public class ExcelUploaderService implements IExcelUploadService{
 		}
 
 		@Override
-		public boolean loadFlightSchedulesUsingExcelAndCreateTravelNetwork(XSSFWorkbook workbook) {
+		public boolean loadTravelSchedulesUsingExcelAndUpdateTravelNetwork(XSSFWorkbook workbook) {
 				try {
 						XSSFSheet worksheet = workbook.getSheetAt(0);
 						Map<String, Connection> connectionMap =  new HashMap<>();
@@ -162,6 +164,7 @@ public class ExcelUploaderService implements IExcelUploadService{
 								busSeat.setFare(sittingPrice);
 						}
 				});
+				return connection;
 		}
 
 		private FlightConnection createFlightConnection(XSSFRow row) {

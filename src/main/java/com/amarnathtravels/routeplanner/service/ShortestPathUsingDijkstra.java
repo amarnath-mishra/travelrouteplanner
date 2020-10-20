@@ -15,42 +15,47 @@ public class ShortestPathUsingDijkstra {
 		private PriorityQueue<Node> pq;
 		private int V; // Number of vertices
 		Map<String, List<GraphNode>> adj;
+		private Map<String, Node> parent;
+		private Node destNode = null;
 
 		public ShortestPathUsingDijkstra(int V) {
 				this.V = V;
 				dist = new HashMap<>();
+				parent = new HashMap<>();
 				visited = new HashSet<>();
 				pq = new PriorityQueue<Node>(V, new DistanceComparator());
 		}
 
-		public void dijkstra(Map<String, List<GraphNode>> adj, String src, TravelMode travelMode) {
+		public void dijkstra(Map<String, List<GraphNode>> adj, String src, String dest, TravelMode travelMode, Node noParent) {
 				this.adj = adj;
-
+				parent.entrySet().forEach(node-> node.setValue(noParent));
 				dist.entrySet().forEach(node -> node.setValue(Long.MAX_VALUE));
 
 				pq.add(new Node(src, 0L, null));
-
+				parent.put(src,noParent);
 				dist.put(src, 0L);
 				while (visited.size() != V) {
 						Node minNode = pq.remove();
+						if(minNode.getCode().equals(dest)){
+								destNode = minNode;
+						}
 						String u = minNode.getCode();
 						visited.add(u);
 
-						e_Neighbours(u, minNode.getLastFlightArrivalTime(), travelMode);
+						goOverNeighbours(minNode, travelMode, parent);
 				}
 		}
 
-		private void e_Neighbours(String u, LocalDateTime lastFlightArrivalTime, TravelMode travelMode) {
+		private void goOverNeighbours(Node node, TravelMode travelMode, Map<String, Node> parent) {
+				String u = node.getCode();
+				LocalDateTime lastFlightArrivalTime = node.getLastFlightArrivalTime();
 				long edgeDistance = -1;
 				long newDistance = -1;
-				// All the neighbors of v
 				List<GraphNode> filteredList = filterConnectionList(adj.get(u), lastFlightArrivalTime);
-				for (GraphNode graphNode : adj.get(u)) {
+				for (GraphNode graphNode : filteredList) {
 
 						if (!visited.contains(graphNode.getCode())) {
 								String nextStopCode = null;
-								Connection connection = null;
-								LocalDateTime lastStopArrivalTime = null;
 								if (travelMode == TravelMode.FLIGHT) {
 										FlightConnection flightConnection = (FlightConnection) graphNode
 												.getConnection();
@@ -73,9 +78,10 @@ public class ShortestPathUsingDijkstra {
 								}
 								newDistance = dist.get(u) + edgeDistance;
 								// If new distance is cheaper in cost
-								if (newDistance < dist.get(nextStopCode))
+								if (newDistance < dist.get(nextStopCode)){
 										dist.put(nextStopCode, newDistance);
-
+										parent.put(nextStopCode, node);
+								}
 								// Add the current node to the queue
 								pq.add(new Node(nextStopCode, dist.get(nextStopCode),
 										graphNode.getConnection().getArrivalTime()));
@@ -124,42 +130,29 @@ public class ShortestPathUsingDijkstra {
 				return list;
 		}
 
-		//		// Driver code
-		//		public static void main(String arg[])
-		//		{
-		//				int V = 5;
-		//				int source = 0;
-		//
-		//				// Adjacency list representation of the
-		//				// connected edges
-		//				List<List<Node> > adj = new ArrayList<List<Node> >();
-		//
-		//				// Initialize list for every node
-		//				for (int i = 0; i < V; i++) {
-		//						List<Node> item = new ArrayList<Node>();
-		//						adj.add(item);
-		//				}
-		//
-		//				// Inputs for the DPQ graph
-		//				adj.get(0).add(new Node(1, 9));
-		//				adj.get(0).add(new Node(2, 6));
-		//				adj.get(0).add(new Node(3, 5));
-		//				adj.get(0).add(new Node(4, 3));
-		//
-		//				adj.get(2).add(new Node(1, 2));
-		//				adj.get(2).add(new Node(3, 4));
-		//
-		//				// Calculate the single source shortest path
-		//				ShortestPathUsingDijkstra dpq = new ShortestPathUsingDijkstra(V);
-		//				dpq.dijkstra(adj, source);
-		//
-		//				// Print the shortest path to all the nodes
-		//				// from the source node
-		//				System.out.println("The shorted path from node :");
-		//				for (int i = 0; i < dpq.dist.length; i++)
-		//						System.out.println(source + " to " + i + " is "
-		//								+ dpq.dist[i]);
-		//		}
+		public List<Node> getShortestPath(Map<String, List<GraphNode>> graph, String src, String dest, TravelMode travelMode,
+				LocalDateTime date) {
+			dijkstra(graph, src, dest, travelMode, new Node("NO_PARENT",0L,null));
+			List<Node> shortestPath = new LinkedList<>();
+			loadPath(destNode, shortestPath);
+			return shortestPath;
+		}
+
+		private  void loadPath(Node currentVertex, List<Node> path)
+		{
+				if (currentVertex.getCode().equals("NO_PARENT"))
+				{
+						return;
+				}
+				if(visited.contains(currentVertex.getCode()))
+				{
+						loadPath(parent.get(currentVertex), path);
+						System.out.print(currentVertex.getCode() + " ");
+						path.add(currentVertex);
+				}
+
+		}
+
 }
 
 class DistanceComparator implements Comparator<Node> {

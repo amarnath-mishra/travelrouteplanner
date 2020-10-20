@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,7 +38,7 @@ public class ExcelUploadController {
 		public Boolean uploadFlightSchedulesToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws
 				IOException {
 				XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
-				iExcelUploadService.loadFlightSchedulesUsingExcelAndCreateTravelNetwork(workbook);
+				iExcelUploadService.loadTravelSchedulesUsingExcelAndUpdateTravelNetwork(workbook);
 				return true;
 		}
 }

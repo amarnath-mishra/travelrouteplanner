@@ -18,7 +18,13 @@ public class AirportDao implements IAirportDao{
 				return graphInMemoryDb.findAirportByCode(airportCode);
 		}
 
-		@Override public boolean saveAllAirports(Map<String, Airport> airportMap) {
+		@Override
+		public boolean saveAllAirports(Map<String, Airport> airportMap) {
 				return graphInMemoryDb.saveAllAirports(airportMap);
+		}
+
+		@Override
+		public boolean saveAirport(Airport airport) {
+				return graphInMemoryDb.saveAirport(airport);
 		}
 }
