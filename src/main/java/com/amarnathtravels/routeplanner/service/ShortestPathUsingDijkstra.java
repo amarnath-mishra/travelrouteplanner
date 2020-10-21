@@ -35,7 +35,7 @@ public class ShortestPathUsingDijkstra {
 				});
 				//dist.entrySet().forEach(node -> node.setValue(Long.MAX_VALUE));
 
-				pq.add(new Node(src, 0L, null));
+				pq.add(new Node(src, null,null,0L, null,null));
 				parent.put(src,noParent);
 				dist.put(src, 0L);
 				while (visited.size() != V && pq.size()>0) {
@@ -52,23 +52,26 @@ public class ShortestPathUsingDijkstra {
 
 		private void goOverNeighbours(Node node, TravelMode travelMode, Map<String, Node> parent) {
 				String u = node.getCode();
-				LocalDateTime lastFlightArrivalTime = node.getLastFlightArrivalTime();
+				LocalDateTime lastFlightArrivalTime = node.getLastArrivalTime();
 				long edgeDistance = -1;
 				long newDistance = -1;
 				List<GraphNode> filteredList = filterConnectionList(adj.get(u), lastFlightArrivalTime);
 				for (GraphNode graphNode : filteredList) {
 
 						if (!visited.contains(graphNode.getCode())) {
+								Node nextNode = new Node();
 								String nextStopCode = null;
 								if (travelMode == TravelMode.FLIGHT) {
 										FlightConnection flightConnection = (FlightConnection) graphNode
 												.getConnection();
+										nextNode.setFlightCode(flightConnection.getFlight().getFlightNo());
 										Duration flightDuration = Duration.between(flightConnection.getDeptTime(),
 												flightConnection.getArrivalTime());
 										edgeDistance = flightDuration.toMinutes();
 										nextStopCode = flightConnection.getDest().getCode();
 								} else {
 										BusConnection busConnection = (BusConnection) graphNode.getConnection();
+										nextNode.setBusCode(busConnection.getBus().getBusNo());
 										Duration flightDuration = Duration
 												.between(busConnection.getDeptTime(), busConnection.getArrivalTime());
 										edgeDistance = flightDuration.toMinutes();
@@ -81,14 +84,15 @@ public class ShortestPathUsingDijkstra {
 										edgeDistance += waitingTime.toMinutes();
 								}
 								newDistance = dist.get(u) + edgeDistance;
-								// If new distance is cheaper in cost
 								if (newDistance < dist.get(nextStopCode)){
 										dist.put(nextStopCode, newDistance);
 										parent.put(nextStopCode, node);
 								}
-								// Add the current node to the queue
-								pq.add(new Node(nextStopCode, dist.get(nextStopCode),
-										graphNode.getConnection().getArrivalTime()));
+								nextNode.setCode(nextStopCode);
+								nextNode.setCostInMinutes(dist.get(nextStopCode));
+								nextNode.setLastDepartureTime(graphNode.getConnection().getDeptTime());
+								nextNode.setLastArrivalTime(graphNode.getConnection().getArrivalTime());
+								pq.add(nextNode);
 
 						}
 				}
@@ -136,7 +140,7 @@ public class ShortestPathUsingDijkstra {
 
 		public List<Node> getShortestPath(Map<String, List<GraphNode>> graph, String src, String dest, TravelMode travelMode,
 				LocalDateTime date) {
-			dijkstra(graph, src, dest, travelMode, new Node("NO_PARENT",0L,null));
+			dijkstra(graph, src, dest, travelMode, new Node("NO_PARENT",null, null,0L, null,null));
 			List<Node> shortestPath = new LinkedList<>();
 			if(destNode==null){
 					return null;
