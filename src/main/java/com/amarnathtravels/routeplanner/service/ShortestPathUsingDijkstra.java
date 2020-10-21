@@ -28,13 +28,17 @@ public class ShortestPathUsingDijkstra {
 
 		public void dijkstra(Map<String, List<GraphNode>> adj, String src, String dest, TravelMode travelMode, Node noParent) {
 				this.adj = adj;
-				parent.entrySet().forEach(node-> node.setValue(noParent));
-				dist.entrySet().forEach(node -> node.setValue(Long.MAX_VALUE));
+				//parent.entrySet().forEach(node-> node.setValue(noParent));
+				adj.entrySet().stream().map(Map.Entry::getKey).forEach(key->{
+						dist.putIfAbsent(key,Long.MAX_VALUE);
+						parent.put(key, noParent);
+				});
+				//dist.entrySet().forEach(node -> node.setValue(Long.MAX_VALUE));
 
 				pq.add(new Node(src, 0L, null));
 				parent.put(src,noParent);
 				dist.put(src, 0L);
-				while (visited.size() != V) {
+				while (visited.size() != V && pq.size()>0) {
 						Node minNode = pq.remove();
 						if(minNode.getCode().equals(dest)){
 								destNode = minNode;
@@ -59,8 +63,8 @@ public class ShortestPathUsingDijkstra {
 								if (travelMode == TravelMode.FLIGHT) {
 										FlightConnection flightConnection = (FlightConnection) graphNode
 												.getConnection();
-										Duration flightDuration = Duration.between(flightConnection.getArrivalTime(),
-												flightConnection.getDeptTime());
+										Duration flightDuration = Duration.between(flightConnection.getDeptTime(),
+												flightConnection.getArrivalTime());
 										edgeDistance = flightDuration.toMinutes();
 										nextStopCode = flightConnection.getDest().getCode();
 								} else {
@@ -72,8 +76,8 @@ public class ShortestPathUsingDijkstra {
 								}
 
 								if (lastFlightArrivalTime != null) {
-										Duration waitingTime = Duration.between(graphNode.getConnection().getDeptTime(),
-												lastFlightArrivalTime);
+										Duration waitingTime = Duration.between(lastFlightArrivalTime,
+												graphNode.getConnection().getDeptTime());
 										edgeDistance += waitingTime.toMinutes();
 								}
 								newDistance = dist.get(u) + edgeDistance;
@@ -124,7 +128,7 @@ public class ShortestPathUsingDijkstra {
 										}
 										return (int) (duration1 - duration2);
 								}).collect(Collectors.toList());
-								list.add(collect.get(collect.size() - 1));
+								list.add(collect.get(0));
 						}
 				});
 				return list;
@@ -134,6 +138,9 @@ public class ShortestPathUsingDijkstra {
 				LocalDateTime date) {
 			dijkstra(graph, src, dest, travelMode, new Node("NO_PARENT",0L,null));
 			List<Node> shortestPath = new LinkedList<>();
+			if(destNode==null){
+					return null;
+			}
 			loadPath(destNode, shortestPath);
 			return shortestPath;
 		}
@@ -146,8 +153,8 @@ public class ShortestPathUsingDijkstra {
 				}
 				if(visited.contains(currentVertex.getCode()))
 				{
-						loadPath(parent.get(currentVertex), path);
-						System.out.print(currentVertex.getCode() + " ");
+						loadPath(parent.get(currentVertex.getCode()), path);
+						System.out.print(currentVertex.getCode() + " -> ");
 						path.add(currentVertex);
 				}
 

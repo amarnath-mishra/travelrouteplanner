@@ -1,7 +1,6 @@
 package com.amarnathtravels.routeplanner.dao.db;
 
-import com.amarnathtravels.routeplanner.dao.route.GraphNode;
-import com.amarnathtravels.routeplanner.dao.route.TravelMode;
+import com.amarnathtravels.routeplanner.dao.route.*;
 import com.amarnathtravels.routeplanner.model.bus.BusStand;
 import com.amarnathtravels.routeplanner.model.flight.*;
 import org.springframework.stereotype.Component;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class GraphInMemoryDb implements ITravelInMemoryDB {
@@ -19,10 +19,10 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		 * but for now I am assuming each city will have only one airport and one bus stand, although we can have this use case with current Graph Structure also
 		 */
 
-		private Map<String, Map<TravelMode,Map<String, List<GraphNode>>>> graph;
-		private Map<String, Airport> airportMap;
-		private Map<String, Flight> flightMap;
-		private Map<String, String> codeVsCityMap= new HashMap<>();
+		public Map<String, Map<TravelMode,Map<String, List<GraphNode>>>> graph =new HashMap<>();
+		public Map<String, Airport> airportMap=new HashMap<>();
+		public Map<String, Flight> flightMap=new HashMap<>();
+		public Map<String, String> codeVsCityMap= new HashMap<>();
 
 
 		@Override
@@ -42,6 +42,24 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		}
 
 		@Override
+		public boolean saveRouteConnection(Connection connection) {
+				TravelMode travelMode = connection.getTravelMode();
+				if(travelMode==TravelMode.FLIGHT){
+						FlightConnection flightConnection = (FlightConnection) connection;
+						String srcAirportCode =flightConnection.getSource().getCode();
+						String city = codeVsCityMap.get(srcAirportCode);
+						graph.get(city).get(TravelMode.FLIGHT).get(srcAirportCode).add(	new GraphNode(flightConnection.getDest().getCode(),connection));
+				} else {
+						BusConnection busConnection = (BusConnection) connection;
+						String srcBusStandCode =busConnection.getSource().getCode();
+						String city = codeVsCityMap.get(srcBusStandCode);
+						graph.get(city).get(TravelMode.FLIGHT).get(srcBusStandCode).add(new GraphNode(busConnection.getDest().getCode(),connection));
+				}
+				return true;
+		}
+
+
+		@Override
 		public Map<String, List<GraphNode>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src,
 				String dest, TravelMode travelMode, LocalDateTime date) {
 				/***:: For now I am returning the entire Graph, but we can assume that
@@ -49,12 +67,28 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 				 * and can return a very shorter Map with lesser nodes,
 				 * so that having them in memory and apply algorithms/operations, wont cause any issue
 				 */
-				String city = codeVsCityMap.get(src);
-				return graph.get(city).get(travelMode);
+
+				Map<String, List<GraphNode>> clippedGraph = new HashMap<>();
+				graph.entrySet().stream().map(Map.Entry::getValue).forEach(travelModeMap -> {
+						travelModeMap.entrySet().stream().filter(map->map.getKey().equals(travelMode)).map(Map.Entry::getValue).forEach(codeVsConnection->{
+								codeVsConnection.entrySet().stream().forEach(node->{
+										if(clippedGraph.get(node.getKey())==null){
+												clippedGraph.put(node.getKey(), new LinkedList<>());
+										}
+										clippedGraph.get(node.getKey()).addAll(node.getValue());
+								});
+						});
+				});
+				clippedGraph.entrySet().forEach(node->{
+						clippedGraph.put(node.getKey(), node.getValue().stream().filter(i->i.getConnection().getDeptTime().isAfter(date) && i.getConnection().getDeptTime().isBefore(date.plusDays(2))).collect(
+								Collectors.toCollection(ArrayList::new)));
+				});
+//				String city = codeVsCityMap.get(src);
+//				return graph.get(city).get(travelMode);
+				return clippedGraph;
 		}
 
-		@Override public boolean saveAirport(Airport airport) {
-				String city = airport.getCode();
+		@Override public boolean saveAirport(Airport airport, String city) {
 				if(graph.get(city)==null){
 						Map<TravelMode,Map<String, List<GraphNode>>> travelModeGraph = new HashMap<>();
 						graph.put(city, travelModeGraph );

@@ -4,6 +4,7 @@ import com.amarnathtravels.routeplanner.dao.IGraphDao;
 import com.amarnathtravels.routeplanner.dao.route.Connection;
 import com.amarnathtravels.routeplanner.dao.route.GraphNode;
 import com.amarnathtravels.routeplanner.dao.route.TravelMode;
+import com.amarnathtravels.routeplanner.exception.DestNotReachableException;
 import com.amarnathtravels.routeplanner.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,16 @@ public class TravelRouteRecommendationService implements ITravelRouteRecommendat
 		 * @return
 		 */
 		@Override
-		public List<Node> getLeastTimeTakenRoute(String src, String dest,String travelMode1, LocalDateTime date) {
+		public List<Node> getLeastTimeTakenRoute(String src, String dest,String travelMode1, LocalDateTime date)
+				throws DestNotReachableException {
 				TravelMode travelMode = TravelMode.valueOf(travelMode1);
 				Map<String, List<GraphNode>> graph = graphDao.fetchGraphBasedOnSourceDestTravelModeAndDate(src, dest, travelMode, date);
 				List<Node> paths= getPathsOfShortestDurationToReachDestination( graph, src, dest, travelMode, date);
 				return paths;
+		}
+
+		@Override public String hello() {
+				return null;
 		}
 
 		/***
@@ -35,9 +41,12 @@ public class TravelRouteRecommendationService implements ITravelRouteRecommendat
 		 * and in that case it should return List<List<Connection>>.
 		 */
 		private List<Node> getPathsOfShortestDurationToReachDestination(Map<String, List<GraphNode>> graph,
-				String src, String dest, TravelMode travelMode, LocalDateTime date) {
+				String src, String dest, TravelMode travelMode, LocalDateTime date) throws DestNotReachableException {
 				ShortestPathUsingDijkstra shortestPathUsingDijkstra = new ShortestPathUsingDijkstra(graph.size());
 				List<Node> shortestPath = shortestPathUsingDijkstra.getShortestPath(graph, src, dest, travelMode, date);
+				if(shortestPath==null){
+						throw new DestNotReachableException("No "+  travelMode.name() + "S for given requests");
+				}
 				return shortestPath;
 		}
 

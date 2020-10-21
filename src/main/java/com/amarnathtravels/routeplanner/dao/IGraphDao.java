@@ -1,5 +1,6 @@
 package com.amarnathtravels.routeplanner.dao;
 
+import com.amarnathtravels.routeplanner.dao.route.Connection;
 import com.amarnathtravels.routeplanner.dao.route.GraphNode;
 import com.amarnathtravels.routeplanner.dao.route.TravelMode;
 
@@ -12,6 +13,7 @@ public interface IGraphDao {
 
 		Map<String, String> getCodeVsCityMap();
 
-		public Map<String, List<GraphNode>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src, String dest,
+		Map<String, List<GraphNode>> fetchGraphBasedOnSourceDestTravelModeAndDate(String src, String dest,
 				TravelMode travelMode, LocalDateTime date);
+		boolean saveRouteConnection(Connection connection);
 }

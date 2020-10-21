@@ -1,4 +1,4 @@
-package com.amarnathtravels.routeplanner.service;
+package com.amarnathtravels.routeplanner.dao;
 
 import com.amarnathtravels.routeplanner.model.bus.Bus;
 

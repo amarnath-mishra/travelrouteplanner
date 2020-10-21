@@ -9,5 +9,5 @@ public interface IAirportDao {
 		Map<String, Airport> getAllAirportsMap();
 		Airport findAirportByCode(String airportCode);
 		boolean saveAllAirports(Map<String, Airport> airportMap);
-		boolean saveAirport(Airport airport);
+		boolean saveAirport(Airport airport, String city);
 }

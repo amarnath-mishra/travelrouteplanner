@@ -20,6 +20,6 @@ public class FlightDao implements IFlightDao{
 		}
 
 		@Override public Flight findFlightByCode(String flightCode) {
-				return null;
+				return graphInMemoryDb.findFlightByCode(flightCode);
 		}
 }

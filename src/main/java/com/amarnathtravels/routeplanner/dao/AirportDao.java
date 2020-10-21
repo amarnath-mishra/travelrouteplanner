@@ -24,7 +24,7 @@ public class AirportDao implements IAirportDao{
 		}
 
 		@Override
-		public boolean saveAirport(Airport airport) {
-				return graphInMemoryDb.saveAirport(airport);
+		public boolean saveAirport(Airport airport, String city) {
+				return graphInMemoryDb.saveAirport(airport, city);
 		}
 }
