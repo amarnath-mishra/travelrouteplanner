@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ExcelUploadController {
 		private final IExcelUploadService iExcelUploadService;
-		@PostMapping("/uploadFlights")
+		@PostMapping("/uploadFlightsOrBus")
 		@ResponseBody
 		public Boolean uploadFlightsToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws
 				IOException {
@@ -24,7 +24,7 @@ public class ExcelUploadController {
 				return true;
 		}
 
-		@PostMapping("/uploadAirports")
+		@PostMapping("/uploadAirportsOrBusStands")
 		@ResponseBody
 		public Boolean uploadAirportsToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws
 				IOException {
@@ -33,7 +33,7 @@ public class ExcelUploadController {
 				return true;
 		}
 
-		@PostMapping("/uploadFlightSchedules")
+		@PostMapping("/uploadFlightOrBusSchedules-")
 		@ResponseBody
 		public Boolean uploadFlightSchedulesToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws
 				IOException {

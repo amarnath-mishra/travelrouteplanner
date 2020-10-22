@@ -17,7 +17,7 @@ import java.util.List;
 @Controller public class RecommendationController {
 		@Autowired ITravelRouteRecommendationService iTravelRouteRecommendationService;
 
-		@GetMapping(value = "/recommendFlight/{src}/{dest}/{travelMode}/{date}")
+		@GetMapping(value = "/recommendFlightsOrBus/{src}/{dest}/{travelMode}/{date}")
 		public @ResponseBody List<Node> recommendRoutes(
 				@PathVariable String src, @PathVariable String dest,@PathVariable String travelMode,
 				@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date)
@@ -25,6 +25,7 @@ import java.util.List;
 
 				return iTravelRouteRecommendationService.getLeastTimeTakenRoute(src, dest, travelMode,date);
 		}
+
 
 		@GetMapping("/hello2")
 		@ResponseBody

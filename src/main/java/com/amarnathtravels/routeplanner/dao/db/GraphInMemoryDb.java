@@ -19,10 +19,10 @@ public class GraphInMemoryDb implements ITravelInMemoryDB {
 		 * but for now I am assuming each city will have only one airport and one bus stand, although we can have this use case with current Graph Structure also
 		 */
 
-		public Map<String, Map<TravelMode,Map<String, List<GraphNode>>>> graph =new HashMap<>();
-		public Map<String, Airport> airportMap=new HashMap<>();
-		public Map<String, Flight> flightMap=new HashMap<>();
-		public Map<String, String> codeVsCityMap= new HashMap<>();
+		private Map<String, Map<TravelMode,Map<String, List<GraphNode>>>> graph =new HashMap<>();
+		private Map<String, Airport> airportMap=new HashMap<>();
+		private Map<String, Flight> flightMap=new HashMap<>();
+		private Map<String, String> codeVsCityMap= new HashMap<>();
 
 
 		@Override
